@@ -1,10 +1,10 @@
 const express = require('express');
 
-const catchAsync = require('../utils/catchAsync');
 const cartController = require('../controllers/cartController');
+const authController = require('../controllers/authController');
 
 const router = express.Router();
 
-router.route('/').post(cartController.addToCart);
+router.route('/').post(authController.protect, cartController.addToCart);
 
 module.exports = router;

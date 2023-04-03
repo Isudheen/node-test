@@ -53,3 +53,26 @@ exports.login = catchAsync(async (req, res, next) => {
   });
   next();
 });
+
+exports.protect = catchAsync(async (req, res, next) => {
+  let token;
+  if (req.headers.jwt) {
+    token = req.headers.jwt;
+  }
+
+  if (!token) throw new Error('Not logged in, Please login or signup');
+
+  const verify = jwt.verify(token, process.env.JWT_SECRET);
+  // { id: 'Harry', iat: 1680512765 }
+
+  const user = await User.findOne({ name: verify.id });
+  req.user = user; //assigning user to the request body
+  next();
+});
+
+exports.adminProtect = catchAsync(async (req, res, next) => {
+  const userRole = req.user.role;
+  if (userRole != 'admin') throw new Error('Unauthorized');
+
+  next();
+});
